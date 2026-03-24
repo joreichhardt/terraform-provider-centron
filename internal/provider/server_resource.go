@@ -281,17 +281,8 @@ func (r *serverResource) Create(ctx context.Context, req resource.CreateRequest,
 		resp.Diagnostics.AddError("Error creating server", err.Error())
 		return
 	}
-
-	// We use the hostname as the identifier in the terraform state for querying,
-	// but we could also store the numeric ID. Let's store the numeric ID as a string.
-	// But API endpoints like `Get the snapshots of a server by its hostname.` use hostname.
-	// Wait, `Get details for a server by its hostname.` is `GET /ccloud/servers/{hostname}`.
-	// So let's store `hostname` internally, or set `id` to the returned ID but use hostname in Read.
-	
-	// Wait, we need to poll for creation to complete possibly. But for simple MVP, we just assume it's created or we wait a bit.
+	// Polling for server state = provisioned to be added in future iterations.
 	plan.ID = types.StringValue(strconv.Itoa(createResp.ID))
-
-	// In the MVP we won't wait for server state = provisioned. 
 
 	diags = resp.State.Set(ctx, plan)
 	resp.Diagnostics.Append(diags...)
@@ -310,7 +301,7 @@ func (r *serverResource) Read(ctx context.Context, req resource.ReadRequest, res
 			Cores  int    `json:"cores"`
 			Memory int    `json:"memory"`
 			Type   string `json:"type"`
-			// adding more fields if necessary...
+			// future expansion fields here
 		} `json:"data"`
 	}
 
@@ -322,7 +313,7 @@ func (r *serverResource) Read(ctx context.Context, req resource.ReadRequest, res
 		return
 	}
 
-	// update state if we want, but Centron API GET server structure differs from POST
+	// Sync State with retrieved values. Note: GET response payload differs from POST.
 	state.Cores = types.Int64Value(int64(sr.Data.Cores))
 	state.Memory = types.Int64Value(int64(sr.Data.Memory))
 	if sr.Data.Type != "" {
@@ -334,8 +325,7 @@ func (r *serverResource) Read(ctx context.Context, req resource.ReadRequest, res
 }
 
 func (r *serverResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	// Not supporting complex updates yet beyond typical tf force-recreate
-	// We'd have to handle scaling cores/memory individually.
+	// Complex updates, like scaling memory/cores without recreation, are reserved for future iterations.
 	var plan serverResourceModel
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
@@ -356,8 +346,6 @@ func (r *serverResource) Delete(ctx context.Context, req resource.DeleteRequest,
 	}
 
 	// DELETE /ccloud/servers/{hostname}
-	// Wait, API docs say: DELETE /ccloud/servers/{hostname}
-	// Let's call it.
 	err := r.client.DoRequest(ctx, "DELETE", "/ccloud/servers/"+state.Hostname.ValueString(), nil, nil)
 	if err != nil {
 		resp.Diagnostics.AddError("Error deleting server", err.Error())
