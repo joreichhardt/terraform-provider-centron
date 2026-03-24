@@ -1,0 +1,15 @@
+# Compiled builds
+terraform-provider-centron
+
+# Terraform files
+.terraform/
+.terraformrc
+terraform.tfstate
+terraform.tfstate.backup
+.terraform.lock.hcl
+*.tfvars
+
+# Go
+bin/
+obj/
+*.test
