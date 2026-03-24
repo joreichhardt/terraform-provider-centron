@@ -56,3 +56,15 @@ provider "centron" {
 4. Run `TF_CLI_CONFIG_FILE=/path/to/.terraformrc terraform plan` inside your test configurations folder to test changes.
 
 Contributions are warmly welcomed! 🚀
+
+## License
+
+**AGPL-3.0**
+
+This project is licensed under AGPL-3.0.
+
+Commercial licenses are available for companies that:
+- want to use this provider in closed-source environments
+- want to avoid AGPL obligations
+
+Contact: johannes.reichhardt@gmail.com
