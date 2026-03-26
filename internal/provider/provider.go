@@ -110,4 +110,4 @@ func (p *centronProvider) Resources(ctx context.Context) []func() resource.Resou
 
 func (p *centronProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{}
-}
+//some work}
